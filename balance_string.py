@@ -39,6 +39,6 @@ def solve(A):
         print(count*2)
 
 
-
+#출력 합니다.
 A = input().strip()
 print(solve(A))
