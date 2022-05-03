@@ -1,11 +1,12 @@
 #BST(Binary search Tree) 이진탐색트리
 
 class Node:
-    def __init__(self, key, parent=None, left=None, right=None):
+    def __init__(self,key, parent=None, left=None, right=None):
         self.key = key
         self.parent = parent
         self.left = left
         self.right = right
+
 
     def __str__(self):
         return str(self.key)
@@ -41,6 +42,28 @@ class Tree:
             return p
         else:
             return None
+
+    def insert(self, key):
+        v = Node(key)
+        if self.size == 0:
+            self.root = v
+        else:
+            p = self.find_loc(key)
+            if p and p.key != key: # p is parent of v
+                if p.key > key:
+                    p.left = v
+                else:
+                    p.right = v
+                v.parent = p #삽입된 노드의 부모 노드 설정
+        self.size += 1 # 22.05.03 첫 작성시 해당라인과 리턴 위치로 에러 발생함 주의하기
+        return v
+
+T = Tree()
+a,b,c,d = T.insert(1),T.insert(2),T.insert(3),T.insert(4)
+print(b.key)
+T.insert(10)
+print(d.left.key)
+
 
 
 
