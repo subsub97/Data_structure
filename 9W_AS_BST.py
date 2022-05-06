@@ -106,10 +106,21 @@ class BST:
             if c:
                 c.parent = p
         self.size -= 1
+        #height 업데이트하는 라인 구현하기
 
     def deleteByCopying(self, x):
+        key = x.key
+        x = self.search(key)# 제거 해야할 노드 x 찾기
+        l , r, p = x.left,x.right,x.parent# find max.key node in left child Node
+        m = r # max를 찾아 저장할 변수 생성
+        # 찾은 max 노드를 지울 x 노드로 카피하기 이과정에서 노드관계 다시 연결
+        while m: #find right max
+            m = m.right
+        ml,mp,x = m.left,m.parent,m # m 을 옮기고 새로운 관계 형성을 위한 변수생성
+        m.left,m.right,m.parent = l,r,p
+        ml.parent = mp
         # 노드들의 height 정보 update 필요
-        pass
+
 
 
     def height(self, x):  # 노드 x의 height 값을 리턴
