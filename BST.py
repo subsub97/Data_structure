@@ -58,6 +58,36 @@ class Tree:
         self.size += 1 # 22.05.03 첫 작성시 해당라인과 리턴 위치로 에러 발생함 주의하기
         return v
 
+    def deletByMerging(self,x):
+        a,b,pt = x.left, x.right,x.parent
+        if a == None:
+            c = b
+        else:
+            c = m = a
+
+            while m.right:
+                m = m.right
+            m.right = b
+            if b : b.parent = m
+
+        if self.root == x:
+            if c:
+                c.parent = None
+                self.root = c
+        else:
+            if pt.left == x:
+                pt.left = c
+            else:
+                if pt.left == x:
+                    pt.left = c
+                else:
+                    pt.right = c
+                if c:
+                    c.parent = pt
+            self.size -= 1
+
+
+
 T = Tree()
 a,b,c,d = T.insert(1),T.insert(2),T.insert(3),T.insert(4)
 print(b.key)
