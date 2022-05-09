@@ -112,16 +112,41 @@ class BST:
         key = x.key
         x = self.search(key)# 제거 해야할 노드 x 찾기
         l , r, p = x.left,x.right,x.parent# find max.key node in left child Node
-        m = r # max를 찾아 저장할 변수 생성
         # 찾은 max 노드를 지울 x 노드로 카피하기 이과정에서 노드관계 다시 연결
-        while m: #find right max
-            m = m.right
-        ml,mp,x = m.left,m.parent,m # m 을 옮기고 새로운 관계 형성을 위한 변수생성
-        m.left,m.right,m.parent = l,r,p
-        ml.parent = mp
-        # 노드들의 height 정보 update 필요
+        if l != None:
+            m = l.left
+            while m.right: #find right max
+                m = m.right
+            x.key == m.key
+            if m.left:
+                m.left.parent = m.parent
+            if m.parent.left is m:
+                m.parent.left = m.left
+            else:
+                m.parent.right =m.left
+            # 노드들의 height 정보 update 필요
+        elif r != None:
+            m = r
+            while m.left:
+                m = m.left
+            x.key == m.key
+            if m.right:
+                m.right.parent = m.parent
+            if m.parent.left is m:
+                m.parent.left = m.left
+            else:
+                m.parent.right =m.right
+            # 노드들의 height 정보 update 필요
 
-
+        else: # L,R 둘 다 없음
+            if p == None:
+                self.root =None
+            else:
+                if p.left is x:
+                    p.left = None
+                else:
+                    p.right = None
+        self.size -= 1
 
     def height(self, x):  # 노드 x의 height 값을 리턴
         if x == None:
