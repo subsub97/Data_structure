@@ -54,7 +54,7 @@ class BST:
                 else:
                     p = v
                     v = v.left
-        return p
+        return p #Node를 return
 
 
     def search(self, key):
@@ -148,7 +148,7 @@ class BST:
                     p.right = None
         self.size -= 1
 
-    def height(self, x):  # 노드 x의 height 값을 리턴
+    def height(self, x):  # 노드 x의 height 값을 리턴 리프노드가 0
         if x == None:
             return -1
         else:
@@ -157,12 +157,34 @@ class BST:
 
     def succ(self, x):  # key값의 오름차순 순서에서 x.key 값의 다음 노드(successor) 리턴
         # x의 successor가 없다면 (즉, x.key가 최대값이면) None 리턴
-        pass
+        key = x.key #밑에서 단축 설정에 이용하기 위한 수로 바꾸기
+        f = self.find_loc(key)
+        r = f.right
+        if r == None:
+            return None
+        else:
+            while r.left:
+                r = r.left
+            return r
+
 
 
     def pred(self, x):  # key값의 오름차순 순서에서 x.key 값의 이전 노드(predecssor) 리턴
         # x의 predecessor가 없다면 (즉, x.key가 최소값이면) None 리턴
-        pass
+        if x == None:
+            return None
+        key = x.key
+        f = self.find_loc(key)
+        l = f.left
+        if l == None:
+            if f.parent != None # parent가 없는 root 노드인 경우를 대비
+                if f.parent.key < f.key:
+                    return f.parent
+            return None
+        else:
+            while l.right:
+                l = l.right
+            return l
 
 
     def rotateLeft(self, x):  # 균형이진탐색트리의 1차시 동영상 시청 필요 (height 정보 수정 필요)
