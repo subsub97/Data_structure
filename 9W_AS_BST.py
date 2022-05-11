@@ -109,38 +109,35 @@ class BST:
         #height 업데이트하는 라인 구현하기
 
     def deleteByCopying(self, x):
-        key = x.key
-        x = self.search(key)# 제거 해야할 노드 x 찾기
-        l , r, p = x.left,x.right,x.parent# find max.key node in left child Node
+        l,r,p = x.left,x.right,x.parent # find max.key node in left child Node
         # 찾은 max 노드를 지울 x 노드로 카피하기 이과정에서 노드관계 다시 연결
-        if l != None:
-            m = l.left
+        if l:
+            m = l
             while m.right: #find right max
                 m = m.right
-            x.key == m.key
+            x.key = m.key
             if m.left:
                 m.left.parent = m.parent
             if m.parent.left is m:
                 m.parent.left = m.left
             else:
-                m.parent.right =m.left
+                m.parent.right = m.left
             # 노드들의 height 정보 update 필요
-        elif r != None:
+        elif r:
             m = r
             while m.left:
                 m = m.left
-            x.key == m.key
+            x.key = m.key
             if m.right:
                 m.right.parent = m.parent
             if m.parent.left is m:
-                m.parent.left = m.left
+                m.parent.left = m.right
             else:
                 m.parent.right =m.right
             # 노드들의 height 정보 update 필요
-
         else: # L,R 둘 다 없음
             if p == None:
-                self.root =None
+                self.root = None
             else:
                 if p.left is x:
                     p.left = None
@@ -177,7 +174,7 @@ class BST:
         f = self.find_loc(key)
         l = f.left
         if l == None:
-            if f.parent != None # parent가 없는 root 노드인 경우를 대비
+            if f.parent != None: # parent가 없는 root 노드인 경우를 대비
                 if f.parent.key < f.key:
                     return f.parent
             return None
@@ -188,13 +185,44 @@ class BST:
 
 
     def rotateLeft(self, x):  # 균형이진탐색트리의 1차시 동영상 시청 필요 (height 정보 수정 필요)
-        pass
+        r = x.right
+        if r == None: # 로테이트 할 오른쪽 subtree가 없으면 탈출
+            return
+        l = r.left # 로테이트 과정에서 이사되어질 l을 기억하기
+        r.parent = x.parent
+        if x.parent:
+            if x.parent.left == x:
+                x.parent.left = r
+            else:
+                x.parent.right = r
+        if r:
+            r.left = x
+        x.parent = r
+        x.right = l
+        if l:
+            r.parent = x
+        if x == self.root and x != None:
+            self.root = r
 
-
-    def rotateRight(self, x):  # 균형이진탐색트리의 1차시 동영상 시청 필요 (height 정보 수정 필요)
-        pass
-
-
+    def rotateRight(self, x): # 균형이진탐색트리의 1차시 동영상 시청 필요 (height 정보 수정 필요)
+        l = x.left
+        if l == None:
+            return
+        r = l.right
+        l.parent = x.parent
+        if x.parent:
+            if x.parent.left == x:
+                x.parent.left = l
+            else:
+                x.parent.right = l
+        if l:
+            l.right = x
+        x.parent = l
+        x.left = r
+        if r:
+            r.parent = x
+        if x == self.root and x != None:
+            self.root = l
 T = BST()
 while True:
     cmd = input().split()
