@@ -76,9 +76,15 @@ class BST:
                 else:
                     p.right = v
                 v.parent = p
+                s = v
+            while p:
+                if p.height == s.height:
+                    p.height += 1
+                s = p
+                p = p.parent
         self.size += 1
-        return v
 
+        return v
 
     def deleteByMerging(self, x):
         # 노드들의 height 정보 update 필요
@@ -191,7 +197,7 @@ class BST:
         l = r.left # 로테이트 과정에서 이사되어질 l을 기억하기
         r.parent = x.parent
         if x.parent:
-            if x.parent.left == x:
+            if x.parent.left == x:  # 원래 x가 왼쪽 자식 노드 였는지 확인
                 x.parent.left = r
             else:
                 x.parent.right = r
@@ -200,7 +206,7 @@ class BST:
         x.parent = r
         x.right = l
         if l:
-            r.parent = x
+            l.parent = x
         if x == self.root and x != None:
             self.root = r
 
