@@ -88,24 +88,22 @@ class BST:
 
     def deleteByMerging(self, x):
         # 노드들의 height 정보 update 필요
-        key = x.key # 노드값으로 받아지는것을 search 메소드에서 사용가능하게 int형으로 변환
-        d = self.search(key)
-        l, r, p = d.left,d.right,d.parent
+        l, r, p = x.left,x.right,x.parent
         if l == None: # 지우려고하는 노드의 왼쪽 서브트리가 없는경우
             c = r
         else:
             c = m = l
-            while m.right:
+            while m.right: # 오른쪽 가지 가장 큰 노드 찾기
                 m = m.right
             m.right = r
             if r:
                 r.parent = m
-        if self.root == d:
+        if self.root == x:
             if c:
                 c.parent = None
             self.root = c
         else:
-            if p.left == d: # 원래 우리가 찾았던 x노드와 부무노드와의 위치 관계 판단
+            if p.left == x: # 원래 우리가 찾았던 x노드와 부무노드와의 위치 관계 판단
                 p.left = c
             else:
                 p.right = c
@@ -158,12 +156,17 @@ class BST:
             return x.height
 
 
+
+
     def succ(self, x):  # key값의 오름차순 순서에서 x.key 값의 다음 노드(successor) 리턴
         # x의 successor가 없다면 (즉, x.key가 최대값이면) None 리턴
-        key = x.key #밑에서 단축 설정에 이용하기 위한 수로 바꾸기
-        f = self.find_loc(key)
-        r = f.right
+        if x == None:
+            return None
+        r = x.right
         if r == None:
+            if x.parent:
+                if x.parent.key > x.key:
+                    return x.parent
             return None
         else:
             while r.left:
@@ -176,13 +179,11 @@ class BST:
         # x의 predecessor가 없다면 (즉, x.key가 최소값이면) None 리턴
         if x == None:
             return None
-        key = x.key
-        f = self.find_loc(key)
-        l = f.left
+        l = x.left
         if l == None:
-            if f.parent != None: # parent가 없는 root 노드인 경우를 대비
-                if f.parent.key < f.key:
-                    return f.parent
+            if x.parent: # parent가 없는 root 노드인 경우를 대비
+                if x.parent.key < x.key:
+                    return x.parent
             return None
         else:
             while l.right:
@@ -209,6 +210,8 @@ class BST:
             l.parent = x
         if x == self.root and x != None:
             self.root = r
+        x.height -= 1
+        r.height += 1
 
     def rotateRight(self, x): # 균형이진탐색트리의 1차시 동영상 시청 필요 (height 정보 수정 필요)
         l = x.left
@@ -229,6 +232,9 @@ class BST:
             r.parent = x
         if x == self.root and x != None:
             self.root = l
+        x.height -= 1
+        l.height += 1
+
 T = BST()
 while True:
     cmd = input().split()

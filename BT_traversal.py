@@ -28,7 +28,15 @@ class Tree:
                 self.postorder(v.left)
             if v.right != None:
                 self.postorder(v.right)
-            print(v.key)
+            print(v.key,end=' ')
+
+    def inorder(self, v):  # LMR
+        if v != None:
+            if v.left:
+                self.inorder(v.left)
+            print(v.key,end = ' ')
+            if v.right:
+                self.inorder(v.right)
 
 
 
@@ -38,12 +46,14 @@ a,b,c,d,e,f = Node(1),Node(2),Node(3),Node(4),Node(5),Node(6)
 
 T.root = a
 a.left = b
-a.right =c
+a.right = c
 c.left = d
 b.right = e
 e.left = f
 
 T.postorder(T.root)
+print("\n")
+T.inorder(T.root)
 
 
 
