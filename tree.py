@@ -15,5 +15,16 @@
             self. size = 0
 
 
+        def height(self.root):
+        l,r = 0,0
+        if root.left:
+            l = height(root.left)+1
+        if root.right:
+            r = height(root.right)+1
+        return max(l,r)
+
+
+
+
 
 
