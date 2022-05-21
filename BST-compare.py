@@ -13,6 +13,20 @@ class BST:
         self.root = None
         self.size = 0
 
+    def update_height(self, v):
+        while v != None:
+            left = -1
+            right = -1
+            if v.left:
+                left = v.left.height
+            if v.right:
+                right = v.right.height
+            if left >= right:
+                v.height = left + 1
+            else:
+                v.height = right + 1
+            v = v.parent
+
     def __len__(self):
         return self.size
 
@@ -24,18 +38,14 @@ class BST:
 
     def inorder(self, v):
         if v != None:
-            if v.left != None:
-                self.inorder(v.left)
+            self.inorder(v.left)
             print(v.key, end=' ')
-            if v.right != None:
-                self.inorder(v.right)
+            self.inorder(v.right)
 
     def postorder(self, v):  # LRM
         if v != None:
-            if v.left != None:
-                self.postorder(v.left)
-            if v.right != None:
-                self.postorder(v.right)
+            self.postorder(v.left)
+            self.postorder(v.right)
             print(v.key, end=' ')
 
 
@@ -44,16 +54,15 @@ class BST:
             return None
         p = None
         v = self.root
-        while v:
+        while v != None:
             if v.key == key:
                 return v
+            elif v.key < key:
+                p = v
+                v = v.right
             else:
-                if v.key < key:
-                    p = v
-                    v = v.right
-                else:
-                    p = v
-                    v = v.left
+                p = v
+                v = v.left
         return p #Node를 return
 
 
@@ -61,96 +70,132 @@ class BST:
         p = self.find_loc(key)
         if p and p.key == key:
             return p
+        else:
+            return None
 
 
     def insert(self, key):
         # 노드들의 height 정보 update 필요
-        v = Node(key)
-        if self.size == 0:
-            self.root = v
-        else:
-            p = self.find_loc(key)
-            if p and p.key != key:
-                if p.key > key:
+        p = self.find_loc(key)
+        if p == None or p.key != key:
+            v = Node(key)
+            if p == None:
+                self.root = v
+            else:
+                v.parent = p
+                if p.key >= key:
                     p.left = v
                 else:
                     p.right = v
-                v.parent = p
-                s = v
-            while p:
-                if p.height == s.height:
-                    p.height += 1
-                s = p
-                p = p.parent
-        self.size += 1
-
-        return v
+            self.size += 1
+            self.update_height(v)
+            return v
+        else:
+            print("key is already in trees")
+            return None
 
     def deleteByMerging(self, x):
         # 노드들의 height 정보 update 필요
-        l, r, p = x.left,x.right,x.parent
-        if l == None: # 지우려고하는 노드의 왼쪽 서브트리가 없는경우
-            c = r
+        a, b, pt = x.left, x.right, x.parent
+        if a == None:
+            c = b
         else:
-            c = m = l
-            while m.right: # 오른쪽 가지 가장 큰 노드 찾기
+            c = m = a
+            while m.right:
                 m = m.right
-            m.right = r
-            if r:
-                r.parent = m
-        if self.root == x:
+            m.right = b
+            if b != None:
+                b.parent = m
+        if self.root == x:  # c becomes a new root
             if c:
                 c.parent = None
             self.root = c
-        else:
-            if p.left == x: # 원래 우리가 찾았던 x노드와 부무노드와의 위치 관계 판단
-                p.left = c
+        else:  # c becomes a child of pt of x
+            if pt.left == x:
+                pt.left = c
             else:
-                p.right = c
+                pt.right = c
             if c:
-                c.parent = p
+                c.parent = pt
         self.size -= 1
-        #height 업데이트하는 라인 구현하기
+        self.update_height(pt)
+        return pt
 
     def deleteByCopying(self, x):
-        l,r,p = x.left,x.right,x.parent # find max.key node in left child Node
-        # 찾은 max 노드를 지울 x 노드로 카피하기 이과정에서 노드관계 다시 연결
-        if l:
-            m = l
-            while m.right: #find right max
-                m = m.right
-            x.key = m.key
-            if m.left:
-                m.left.parent = m.parent
-                # 부모설정 말고도 부모에서 자식관계도 설정하기
-            if m.parent.left is m:
-                m.parent.left = m.left
-                # 부모설정 말고도 부모에서 자식관계도 설정하기
-            else:
-                m.parent.right = m.left
-            # 노드들의 height 정보 update 필요
-        elif r:
-            m = r
-            while m.left:
-                m = m.left
-            x.key = m.key
-            if m.right:
-                m.right.parent = m.parent
-            if m.parent.left is m:
-                m.parent.left = m.right
-            else:
-                m.parent.right =m.right
-            # 노드들의 height 정보 update 필요
-        else: # L,R 둘 다 없음
-            if p == None:
-                self.root = None
-            else:
-                if p.left is x:
-                    p.left = None
+        # 노드들의 height 정보 update 필요
+        if x == None:
+            return
+        a, b, pt = x.left, x.right, x.parent
+        y = None
+        if a:
+            y = a
+            while y.right:
+                y = y.right
+        elif b:
+            y = b
+            while y.left:
+                y = y.left
+        if y == None:
+            if pt:
+                if pt.left == x:
+                    pt.left = None
                 else:
-                    p.right = None
+                    pt.right = None
+            else:
+                self.root = None
+        else:
+            x.key = y.key
+            ya, yb, ypt = y.left, y.right, y.parent
+            c = ya
+            if yb:
+                c = yb
+            if c:
+                c.parent = ypt
+            if ypt.left == y:
+                ypt.left = c
+            else:
+                ypt.right = c
         self.size -= 1
+        self.update_height(pt)
+        return pt
 
+    def height(self, x):  # 노드 x의 height 값을 리턴
+        if x == None:
+            return -1
+        else:
+            return x.height
+
+    def succ(self, x):  # key값의 오름차순 순서에서 x.key 값의 다음 노드(successor) 리턴
+        # x의 successor가 없다면 (즉, x.key가 최대값이면) None 리턴
+        if x == None or self.size == 1:
+            return None
+        r = x.right
+        while r and r.left:
+            r = r.left
+        if r:
+            return r
+        else:
+            p = x.parent
+            while p and p.right == x:
+                x = p
+                p = p.parent
+            return p
+
+    def pred(self, x):  # key값의 오름차순 순서에서 x.key 값의 이전 노드(predecssor) 리턴
+        # x의 predecessor가 없다면 (즉, x.key가 최소값이면) None 리턴
+        if x == None or self.size == 1:
+            return None
+        l = x.left
+        while l and l.right:
+            l = l.right
+        if l:
+            return l
+        else:
+            p = x.parent
+            while p and p.left == x:
+                x = p
+                p = x.parent
+            return p
     def height(self, x):  # 노드 x의 height 값을 리턴 리프노드가 0
         if x == None:
             return -1
@@ -162,75 +207,82 @@ class BST:
 
     def succ(self, x):  # key값의 오름차순 순서에서 x.key 값의 다음 노드(successor) 리턴
         # x의 successor가 없다면 (즉, x.key가 최대값이면) None 리턴
-        r = x.right
-        if r == None:
+        if x == None or self.size == 1:
             return None
-        else:
-            while r.left:
-                r = r.left
+        r = x.right
+        while r and r.left:
+            r = r.left
+        if r:
             return r
+        else:
+            p = x.parent
+            while p and p.right == x:
+                x = p
+                p = p.parent
+            return p
 
 
 
     def pred(self, x):  # key값의 오름차순 순서에서 x.key 값의 이전 노드(predecssor) 리턴
         # x의 predecessor가 없다면 (즉, x.key가 최소값이면) None 리턴
-        if x == None:
+        if x == None or self.size == 1:
             return None
         l = x.left
-        if l == None:
-            if x.parent != None: # parent가 없는 root 노드인 경우를 대비
-                if x.parent.key < x.key:
-                    return x.parent
-            return None
-        else:
-            while l.right:
-                l = l.right
+        while l and l.right:
+            l = l.right
+        if l:
             return l
+        else:
+            p = x.parent
+            while p and p.left == x:
+                x = p
+                p = x.parent
+            return p
 
 
     def rotateLeft(self, x):  # 균형이진탐색트리의 1차시 동영상 시청 필요 (height 정보 수정 필요)
-        r = x.right
-        if r == None: # 로테이트 할 오른쪽 subtree가 없으면 탈출
+        if x == None:
             return
-        l = r.left # 로테이트 과정에서 이사되어질 l을 기억하기
-        r.parent = x.parent
-        if x.parent:
-            if x.parent.left == x:  # 원래 x가 왼쪽 자식 노드 였는지 확인
-                x.parent.left = r
-            else:
-                x.parent.right = r
-        if r:
-            r.left = x
-        x.parent = r
-        x.right = l
-        if l:
-            l.parent = x
-        if x == self.root and x != None:
-            self.root = r
-        x.height -= 1
-        r.height += 1
-
-    def rotateRight(self, x): # 균형이진탐색트리의 1차시 동영상 시청 필요 (height 정보 수정 필요)
-        l = x.left
-        if l == None:
+        z = x.right
+        if z == None:
             return
-        r = l.right
-        l.parent = x.parent
+        b = z.left
+        z.parent = x.parent
         if x.parent:
             if x.parent.left == x:
-                x.parent.left = l
-            else:
-                x.parent.right = l
-        if l:
-            l.right = x
-        x.parent = l
-        x.left = r
-        if r:
-            r.parent = x
-        if x == self.root and x != None:
-            self.root = l
-        x.height -= 1
-        l.height += 1
+                x.parent.left = z
+            if x.parent.right == x:
+                x.parent.right = z
+        z.left = x
+        x.parent = z
+        x.right = b
+        if b:
+            b.parent = x
+        if self.root == x:
+            self.root = z
+        self.update_height(x)
+
+    def rotateRight(self, x): # 균형이진탐색트리의 1차시 동영상 시청 필요 (height 정보 수정 필요)
+        if x == None:
+            return
+        z = x.left
+        if z == None:
+            return
+        b = z.right
+        z.parent = x.parent
+        if x.parent:
+            if x.parent.left == x:
+                x.parent.left = z
+            if x.parent.right == x:
+                x.parent.right = z
+        z.right = x
+        x.parent = z
+        x.left = b
+        if b:
+            b.parent = x
+        if self.root == x:
+            self.root = z
+        self.update_height(x)
 
 T = BST()
 while True:
